@@ -8,7 +8,7 @@ export const Grid: FC = () => {
 	return (
 		<StyledGrid>
 			{createArr(DEFAULT_Y).map((v, indexY) => (
-				<StyledGridRow>
+				<StyledGridRow key={indexY}>
 					{createArr(DEFAULT_X).map((v, indexX) => (
 						<Pixel key={indexY * DEFAULT_X + indexX} id={indexY * DEFAULT_X + indexX} />
 					))}

@@ -1,10 +1,10 @@
 import './App.css';
-import { Grid } from './components/Grid';
+import { Main } from './components/Main';
 
 function App() {
 	return (
 		<div className='App'>
-			<Grid />
+			<Main />
 		</div>
 	);
 }
