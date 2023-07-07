@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { PALETTE } from '../../utils/constants';
-import { ColorPixel } from '../ColorPixel';
+import { PalettePixel } from '../PalettePixel';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectSelectedColor, setSelectedColor } from '../../redux/slice';
 import { StyledPalette } from './Palette.styled';
@@ -14,12 +14,7 @@ export const Palette: FC = () => {
 	return (
 		<StyledPalette>
 			{PALETTE.map(color => (
-				<ColorPixel
-					key={color}
-					color={color}
-					isActive={color === selectedColor}
-					handleClick={handleClick}
-				/>
+				<PalettePixel key={color} color={color} isActive={color === selectedColor} handleClick={handleClick} />
 			))}
 		</StyledPalette>
 	);

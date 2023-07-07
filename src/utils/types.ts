@@ -1,1 +1,6 @@
-export interface Empty {}
+export interface HistoryElement {
+	id: number;
+	color: string;
+}
+
+export type History = HistoryElement[];
