@@ -1,16 +1,12 @@
 import { DEFAULT_COLOR } from './constants';
 
-export const createGridData = (sizeX: number, sizeY: number) => {
-	const arr = [];
-	let index = 0;
-
-	for (let i = 0; i < sizeY; i++) {
-		for (let j = 0; j < sizeX; i++) {
-			arr.push({ id: index, color: DEFAULT_COLOR });
-		}
+export const createGrid = (size: number) => {
+	const grid: Record<number, string> = {};
+	for (let i = 0; i < size; i++) {
+		grid[i] = DEFAULT_COLOR;
 	}
 
-	return arr;
+	return grid;
 };
 
 export const createArr = (size: number) => {
@@ -18,5 +14,6 @@ export const createArr = (size: number) => {
 	for (let i = 0; i < size; i++) {
 		arr.push(i);
 	}
+
 	return arr;
 };
