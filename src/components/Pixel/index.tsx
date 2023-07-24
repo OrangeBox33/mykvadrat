@@ -1,7 +1,7 @@
-import { FC, MouseEvent, useState } from 'react';
+import { FC, MouseEvent } from 'react';
 import { StyledPixel } from './Pixel.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { MainState, setPixel } from '../../redux/slice';
+import { MainState, setAndSendPixel } from '../../redux/slice';
 
 interface IProps {
 	id: number;
@@ -13,12 +13,12 @@ export const Pixel: FC<IProps> = ({ id }) => {
 
 	const handleHover = (e: MouseEvent) => {
 		if (e.buttons === 1) {
-			dispatch(setPixel(id));
+			dispatch(setAndSendPixel(id));
 		}
 	};
 
 	const handleMouseDown = () => {
-		dispatch(setPixel(id));
+		dispatch(setAndSendPixel(id));
 	};
 
 	return <StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown} />;

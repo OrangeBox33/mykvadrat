@@ -2,6 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_X, DEFAULT_Y, HISTORY_SIZE, PALETTE } from '../utils/constants';
 import { Grid, History, Id } from '../utils/types';
 import { createGrid } from '../utils/utils';
+import { openWSConnection } from '../socket';
+import { AppThunk } from './store';
+
+const socket = openWSConnection();
 
 export interface MainState {
 	grid: Grid;
@@ -14,6 +18,26 @@ const initialState: MainState = {
 	selectedColor: PALETTE[0],
 	history: [],
 };
+
+// export const sendPixel = createAsyncThunk('sendPixel', async (pixel: Pixel) => {
+// 	await socket.send(JSON.stringify(pixel));
+// 	return;
+// });
+
+// export const createAppAsyncThunk = createAsyncThunk.withTypes<{
+// 	state: RootState;
+// 	dispatch: AppDispatch;
+// 	rejectValue: string;
+// }>();
+
+export const setAndSendPixel =
+	(id: number): AppThunk =>
+	async (dispatch, getState) => {
+		const { selectedColor } = getState();
+		dispatch(setPixel);
+		const data = JSON.stringify({ id, color: selectedColor });
+		await socket.send(data);
+	};
 
 export const mainSlice = createSlice({
 	name: 'main',
