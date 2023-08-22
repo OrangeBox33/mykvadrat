@@ -1,4 +1,4 @@
-const socket = new WebSocket('ws://188.225.60.209:81');
+const socket = new WebSocket('ws://5.44.46.7:81');
 
 export const openWSConnection = () => {
 	socket.onopen = () => console.log('ws opened');
