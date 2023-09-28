@@ -7,11 +7,6 @@ import { AppThunk } from './store';
 
 const socket = openWSConnection();
 
-socket.onmessage = message => {
-	const data = message.data;
-	console.log(data);
-};
-
 export interface MainState {
 	grid: Grid;
 	selectedColor: string;
@@ -24,29 +19,35 @@ const initialState: MainState = {
 	history: [],
 };
 
-// export const sendPixel = createAsyncThunk('sendPixel', async (pixel: Pixel) => {
-// 	await socket.send(JSON.stringify(pixel));
-// 	return;
-// });
-
-// export const createAppAsyncThunk = createAsyncThunk.withTypes<{
-// 	state: RootState;
-// 	dispatch: AppDispatch;
-// 	rejectValue: string;
-// }>();
-
 export const setAndSendPixel =
 	(id: number): AppThunk =>
 	async (dispatch, getState) => {
 		const { selectedColor } = getState();
-		dispatch(setPixel({id, color: selectedColor}));
-		const data = JSON.stringify({ id, color: selectedColor });
-		// await socket.send(data);
+		dispatch(pushHistory(id));
+		dispatch(setPixel({ id, color: selectedColor }));
+		const data = JSON.stringify({ id, color: selectedColor, type: 'draw' });
+		await socket.send(data);
 	};
 
-export const setPixelFromServer = ({id, color}:{id: number, color: string}): AppThunk =>
-	async (dispatch) => {
-		dispatch(setPixel({id, color}));
+export const undo = (): AppThunk => async (dispatch, getState) => {
+	const { history } = getState();
+	const { id, color } = history[history.length - 1];
+	dispatch(setPixel({ id, color }));
+	dispatch(popHistory());
+	const data = JSON.stringify({ id, color, type: 'draw' });
+	await socket.send(data);
+};
+
+export const setPixelFromServer =
+	({ id, color }: Pixel): AppThunk =>
+	async dispatch => {
+		dispatch(setPixel({ id, color }));
+	};
+
+export const setGridFromServer =
+	(grid: Grid): AppThunk =>
+	async dispatch => {
+		dispatch(setGrid(grid));
 	};
 
 export const mainSlice = createSlice({
@@ -54,7 +55,7 @@ export const mainSlice = createSlice({
 	initialState,
 	reducers: {
 		setPixel: (state, action: PayloadAction<Pixel>) => {
-			const {id, color} = action.payload;
+			const { id, color } = action.payload;
 			state.grid[id] = color;
 		},
 
@@ -71,17 +72,22 @@ export const mainSlice = createSlice({
 		},
 
 		popHistory: state => {
-			const { id, color } = state.history[state.history.length - 1];
-			state.grid[id] = color;
 			state.history.pop();
-			const data = JSON.stringify({ id, color: state.grid[id] });
-			socket.send(data);
+		},
+
+		setGrid: (state, action: PayloadAction<Grid>) => {
+			const gridFromServer = action.payload;
+
+			for (const id in gridFromServer) {
+				state.grid[id] = gridFromServer[id];
+			}
 		},
 	},
 });
 
 export const selectSelectedColor = (state: MainState) => state.selectedColor;
+export const selectEmptyHistory = (state: MainState) => state.history.length === 0;
 
-export const { setSelectedColor, popHistory, setPixel } = mainSlice.actions;
+export const { setPixel, setSelectedColor, pushHistory, popHistory, setGrid } = mainSlice.actions;
 
 export const mainReducer = mainSlice.reducer;
