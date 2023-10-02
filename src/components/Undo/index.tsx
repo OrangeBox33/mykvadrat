@@ -14,7 +14,7 @@ export const Undo: FC = () => {
 
 	return (
 		<StyledContainer onClick={handleClick} disabled={emptyHistory}>
-			<img src={undoSVG} alt='undo' width='48px' height='48px' />
+			<img src={undoSVG} alt='undo' width='34px' height='34px' />
 		</StyledContainer>
 	);
 };

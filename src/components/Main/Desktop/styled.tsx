@@ -3,9 +3,6 @@ import styled from 'styled-components';
 export const StyledMainContainer = styled.div`
 	height: 100vh;
 	background-color: #5b5d63;
-`;
-
-export const StyledCenteredContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -18,9 +15,19 @@ export const StyledGrid = styled.div`
 
 export const StyledPalette = styled.div`
 	display: flex;
-	margin-top: 5vh;
 `;
 
-export const StyledUndo = styled.div`
-	margin-top: 10vh;
+export const StyledUndo = styled.div``;
+
+export const StyledFlexMobile = styled.div`
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: flex-end;
+`;
+
+export const StyledPaletteUndoDesktop = styled.div`
+	display: flex;
+	justify-content: space-between;
+	margin-top: 5vh;
 `;

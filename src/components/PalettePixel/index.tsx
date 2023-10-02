@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { StyledPalettePixel } from './PalettePixel.styled';
 
 interface IProps {
@@ -8,9 +8,5 @@ interface IProps {
 }
 
 export const PalettePixel: FC<IProps> = ({ color, isActive, handleClick }) => {
-	return (
-		<>
-			<StyledPalettePixel color={color} isActive={isActive} onClick={() => handleClick(color)} />
-		</>
-	);
+	return <StyledPalettePixel color={color} isActive={isActive} onClick={() => handleClick(color)} />;
 };
