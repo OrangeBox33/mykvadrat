@@ -8,7 +8,7 @@ import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { KEYS_OPTIONS, MAX_HISTORY_SIZE } from './constants.js';
-import { createGrid, replacer, reviver } from './helpers.js';
+import { createGrid } from './helpers.js';
 
 const app = express();
 
@@ -31,14 +31,18 @@ server.listen(443);
 server2.listen(80);
 
 let grid = createGrid();
-let history = new Map();
-let historyIndex = 1;
+let oldGrid = createGrid();
+let history = [];
+let historyIndex = 0;
+let notFirstCycle = false;
 
 const data = fs.readFileSync('./save.txt', { encoding: 'utf8', flag: 'r' });
-const parsedData = JSON.parse(data, reviver);
+const parsedData = JSON.parse(data);
 grid = parsedData.grid;
+oldGrid = parsedData.oldGrid;
 history = parsedData.history;
 historyIndex = parsedData.historyIndex;
+notFirstCycle = parsedData.notFirstCycle;
 
 const clients = new Set();
 const wsServer = new WebSocketServer({ server });
@@ -54,10 +58,15 @@ function onConnect(ws) {
 		console.log(type);
 
 		if (type === 'draw') {
-			history.set(historyIndex, { id, color: grid[id] });
+			if (notFirstCycle) {
+				oldGrid[historyIndex] = history[historyIndex];
+			}
+
+			history[historyIndex] = { id, color };
 
 			if (historyIndex === MAX_HISTORY_SIZE) {
 				historyIndex = 1;
+				secondCycle = true;
 			} else {
 				historyIndex++;
 			}
@@ -76,26 +85,21 @@ function onConnect(ws) {
 		}
 
 		if (type === 'history') {
-			const oldGrid = { ...grid };
-			const historyForClientReverse = [];
+			const historyForClient = [];
 
-			for (let i = historyIndex - 1; i > 0; i--) {
-				const { id, color } = history.get(i);
+			if (notFirstCycle) {
+				for (let i = historyIndex; i < MAX_HISTORY_SIZE; i++) {
+					const { id, color } = history[i];
 
-				oldGrid[id] = color;
-				historyForClientReverse.push({ id, color });
-			}
-
-			if (history.size > historyIndex) {
-				for (let i = MAX_HISTORY_SIZE; i >= historyIndex; i--) {
-					const { id, color } = history.get(i);
-
-					oldGrid[id] = color;
-					historyForClientReverse.push({ id, color });
+					historyForClient.push({ id, color });
 				}
 			}
 
-			const historyForClient = historyForClientReverse.reverse();
+			for (let i = 0; i < historyIndex; i++) {
+				const { id, color } = history[i];
+
+				historyForClient.push({ id, color });
+			}
 
 			ws.send(JSON.stringify({ type: 'history', oldGrid, history: historyForClient }));
 		}
@@ -110,5 +114,5 @@ function onConnect(ws) {
 console.log('Сервер запущен на 80 порту');
 
 setInterval(() => {
-	fs.writeFileSync('save.txt', JSON.stringify({ grid, history, historyIndex }, replacer), 'utf-8');
+	fs.writeFileSync('save.txt', JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle }), 'utf-8');
 }, 60000);
