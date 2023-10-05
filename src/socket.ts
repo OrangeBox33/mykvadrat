@@ -1,17 +1,20 @@
-import { setGridFromServer, setPixelFromServer } from './redux/slice';
+import { playHistory, setGridFromServer, setPixelFromServer } from './redux/slice';
 import { store } from './redux/store';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
-export const socket = new WebSocket('wss://kvadratnikitosa.ru');
+export const socket = new ReconnectingWebSocket('wss://kvadratnikitosa.ru');
 
-export const openWSConnection = () => {
-	socket.onopen = () => console.log('ws opened');
-	socket.onclose = () => console.log('ws closed');
+socket.addEventListener('open', () => {
+	console.log('ws open');
+	socket.send(JSON.stringify({ type: 'getGrid' }));
+});
 
-	return socket;
-};
+socket.addEventListener('close', () => {
+	console.log('ws close');
+});
 
-socket.onmessage = message => {
-	const { type, id, color, grid } = JSON.parse(message.data);
+socket.addEventListener('message', message => {
+	const { type, id, color, grid, oldGrid, history } = JSON.parse(message.data);
 	if (type === 'draw') {
 		store.dispatch(setPixelFromServer({ id, color }));
 	}
@@ -19,4 +22,8 @@ socket.onmessage = message => {
 	if (type === 'getGrid') {
 		store.dispatch(setGridFromServer(grid));
 	}
-};
+
+	if (type === 'history') {
+		store.dispatch(playHistory({ oldGrid, history }));
+	}
+});

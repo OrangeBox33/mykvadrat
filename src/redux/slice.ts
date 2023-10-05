@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { DEFAULT_X, DEFAULT_Y, HISTORY_SIZE, PALETTE } from '../utils/constants';
-import { Grid, History, Id, Pixel } from '../utils/types';
-import { createGrid } from '../utils/utils';
-import { openWSConnection } from '../socket';
+import { Grid, History, Id, Pixel, PlayHistoryData } from '../utils/types';
+import { createGrid, sleep } from '../utils/utils';
+import { socket } from '../socket';
 import { AppThunk } from './store';
-
-const socket = openWSConnection();
 
 export interface MainState {
 	grid: Grid;
@@ -38,6 +36,11 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 	await socket.send(data);
 };
 
+export const test1 = (): AppThunk => async (dispatch, getState) => {
+	const data = JSON.stringify({ type: 'history' });
+	await socket.send(data);
+};
+
 export const setPixelFromServer =
 	({ id, color }: Pixel): AppThunk =>
 	async dispatch => {
@@ -48,6 +51,19 @@ export const setGridFromServer =
 	(grid: Grid): AppThunk =>
 	async dispatch => {
 		dispatch(setGrid(grid));
+	};
+
+export const playHistory =
+	({ oldGrid, history }: PlayHistoryData): AppThunk =>
+	async dispatch => {
+		console.log('pre');
+		await dispatch(setGrid(oldGrid));
+		console.log(history);
+		for (let i = 0; i < history.length; i++) {
+			await sleep(50);
+
+			await dispatch(setPixel(history[i]));
+		}
 	};
 
 export const mainSlice = createSlice({

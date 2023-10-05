@@ -17,3 +17,7 @@ export const createArr = (size: number) => {
 
 	return arr;
 };
+
+export const sleep = async (timer: number) => {
+	return new Promise(resolve => setTimeout(resolve, timer));
+};
