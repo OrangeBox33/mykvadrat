@@ -1,14 +1,14 @@
-import { FC, MouseEvent } from 'react';
+import { MouseEvent, memo } from 'react';
 import { StyledPixel } from './Pixel.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { MainState, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
+import { selectPixelColor, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
 
 interface IProps {
 	id: number;
 }
 
-export const Pixel: FC<IProps> = ({ id }) => {
-	const pixelColor = useAppSelector((state: MainState) => state.grid[id]);
+export const Pixel = memo<IProps>(({ id }) => {
+	const pixelColor = useAppSelector(selectPixelColor(id));
 	const selectedColor = useAppSelector(selectSelectedColor);
 	const dispatch = useAppDispatch();
 
@@ -25,4 +25,4 @@ export const Pixel: FC<IProps> = ({ id }) => {
 	};
 
 	return <StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown} />;
-};
+});

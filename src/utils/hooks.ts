@@ -4,15 +4,21 @@ export const useDeviceType = () => {
 	const [device, setDevice] = useState(1);
 
 	useEffect(() => {
-		const height = window.outerHeight;
-		const width = window.outerWidth;
+		const handleResize = () => {
+			const height = window.innerHeight;
+			const width = window.innerWidth;
 
-		if (height > width) {
-			setDevice(1);
-		} else if (height < 500) {
-			setDevice(2);
-		} else setDevice(0);
-	}, [window.outerHeight]);
+			if (height > width) {
+				setDevice(1);
+			} else if (height < 500) {
+				setDevice(2);
+			} else setDevice(0);
+		};
+
+		window.addEventListener('resize', handleResize);
+
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
 	return device;
 };

@@ -102,6 +102,8 @@ export const mainSlice = createSlice({
 });
 
 export const selectSelectedColor = (state: MainState) => state.selectedColor;
+export const selectGrid = (state: MainState) => state.grid;
+export const selectPixelColor = (id: number) => (state: MainState) => state.grid[id];
 export const selectEmptyHistory = (state: MainState) => state.history.length === 0;
 
 export const { setPixel, setSelectedColor, pushHistory, popHistory, setGrid } = mainSlice.actions;

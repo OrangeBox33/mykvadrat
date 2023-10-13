@@ -7,6 +7,14 @@ import './index.css';
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
+document.body.addEventListener(
+	'touchmove',
+	function (event) {
+		event.preventDefault();
+	},
+	{ passive: false }
+);
+
 root.render(
 	<Provider store={store}>
 		<App />

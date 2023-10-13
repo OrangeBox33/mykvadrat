@@ -66,7 +66,7 @@ function onConnect(ws) {
 
 			if (historyIndex === MAX_HISTORY_SIZE) {
 				historyIndex = 1;
-				secondCycle = true;
+				notFirstCycle = true;
 			} else {
 				historyIndex++;
 			}
