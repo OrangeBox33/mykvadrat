@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import undoSVG from '../../resources/svg/undo.svg';
+import undoPNG from '../../resources/png/undo.png';
 import { StyledContainer } from './Undo.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectEmptyHistory, undo } from '../../redux/slice';
@@ -14,7 +14,7 @@ export const Undo: FC = () => {
 
 	return (
 		<StyledContainer onClick={handleClick} disabled={emptyHistory}>
-			<img src={undoSVG} alt='undo' width='34px' height='34px' />
+			<img src={undoPNG} alt='undo' width='26px' height='26px' />
 		</StyledContainer>
 	);
 };

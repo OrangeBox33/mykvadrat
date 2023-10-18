@@ -24,5 +24,9 @@ export const Pixel = memo<IProps>(({ id }) => {
 		}
 	};
 
-	return <StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown} />;
+	return (
+		<StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown}>
+			{id}
+		</StyledPixel>
+	);
 });

@@ -8,7 +8,7 @@ export const StyledMainContainer = styled.div`
 `;
 
 export const StyledGrid = styled.div`
-	margin: auto 5vh;
+	margin: auto 10vh auto 0;
 `;
 
 export const StyledPalette = styled.div`
@@ -31,7 +31,8 @@ export const StyledPaletteUndo = styled.div`
 	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
-	padding: 5vh;
+	margin-left: 10vh;
+	margin-bottom: 10vh;
 `;
 
 export const StyledFlexMobileRotate = styled.div`

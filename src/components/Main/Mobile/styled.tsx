@@ -17,10 +17,11 @@ export const StyledPalette = styled.div`
 export const StyledFlexMobile = styled.div`
 	display: flex;
 	flex-direction: column;
+	padding-bottom: 10vh;
 `;
 
 export const StyledPaletteUndo = styled.div`
-	margin: 5vh 0;
+	margin-top: 5vh;
 	display: flex;
 	justify-content: space-between;
 `;

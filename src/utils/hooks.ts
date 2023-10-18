@@ -15,6 +15,8 @@ export const useDeviceType = () => {
 			} else setDevice(0);
 		};
 
+		handleResize();
+
 		window.addEventListener('resize', handleResize);
 
 		return () => window.removeEventListener('resize', handleResize);

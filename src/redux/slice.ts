@@ -56,12 +56,10 @@ export const setGridFromServer =
 export const playHistory =
 	({ oldGrid, history }: PlayHistoryData): AppThunk =>
 	async dispatch => {
-		console.log('pre');
 		await dispatch(setGrid(oldGrid));
-		console.log(history);
+
 		for (let i = 0; i < history.length; i++) {
 			await sleep(50);
-
 			await dispatch(setPixel(history[i]));
 		}
 	};

@@ -4,7 +4,7 @@ import { Palette } from '../../Palette';
 import { StyledGrid, StyledMainContainer, StyledPalette, StyledPaletteUndoDesktop, StyledUndo } from './styled';
 import { Undo } from '../../Undo';
 import { useAppDispatch } from '../../../redux/hooks';
-import { test1 } from '../../../redux/slice';
+import { Play } from '../../Play';
 
 export const MainDesktop: FC = () => {
 	const dispatch = useAppDispatch();
@@ -18,7 +18,11 @@ export const MainDesktop: FC = () => {
 					<StyledUndo>
 						<Undo />
 					</StyledUndo>
-					<button onClick={() => dispatch(test1())}>123</button>
+
+					<StyledUndo>
+						<Play />
+					</StyledUndo>
+
 					<StyledPalette>
 						<Palette />
 					</StyledPalette>
