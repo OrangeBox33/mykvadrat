@@ -1,5 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { DEFAULT_X, DEFAULT_Y, UNDO_SIZE, PALETTE, EBrushType, PENCIL, BRUSH } from '../utils/constants';
+import {
+	DEFAULT_X,
+	DEFAULT_Y,
+	UNDO_SIZE,
+	PALETTE,
+	EBrushType,
+	PENCIL,
+	BRUSH,
+} from '../utils/constants';
 import { Grid, History, Id, Ids, Pixel, PlayHistoryData } from '../utils/types';
 import { createGrid, needPaintPixels, sleep } from '../utils/utils';
 import { socket } from '../socket';
@@ -26,10 +34,10 @@ export const setAndSendPixel =
 		if (brushType === BRUSH) {
 			const allNeedPaintIds = needPaintPixels(id);
 
-			const realNeedPaintIds = allNeedPaintIds.filter(id => grid[id] !== selectedColor);
+			const realNeedPaintIds = allNeedPaintIds.filter((id) => grid[id] !== selectedColor);
 
 			if (realNeedPaintIds.length) {
-				const pixels = realNeedPaintIds.map(id => ({ id, color: selectedColor }));
+				const pixels = realNeedPaintIds.map((id) => ({ id, color: selectedColor }));
 
 				dispatch(pushHistory(realNeedPaintIds));
 				dispatch(setPixels(pixels));
@@ -59,26 +67,26 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 	await socket.send(data);
 };
 
-export const test1 = (): AppThunk => async (dispatch, getState) => {
+export const fetchHistory = (): AppThunk => async (dispatch, getState) => {
 	const data = JSON.stringify({ type: 'history' });
 	await socket.send(data);
 };
 
 export const setPixelFromServer =
 	(pixels: Pixel[]): AppThunk =>
-	async dispatch => {
+	async (dispatch) => {
 		dispatch(setPixels(pixels));
 	};
 
 export const setGridFromServer =
 	(grid: Grid): AppThunk =>
-	async dispatch => {
+	async (dispatch) => {
 		dispatch(setGrid(grid));
 	};
 
 export const playHistory =
 	({ oldGrid, history }: PlayHistoryData): AppThunk =>
-	async dispatch => {
+	async (dispatch) => {
 		await dispatch(setGrid(oldGrid));
 
 		for (let i = 0; i < history.length; i++) {
@@ -100,7 +108,7 @@ export const mainSlice = createSlice({
 
 		pushHistory: (state, action: PayloadAction<Ids>) => {
 			const ids = action.payload;
-			const historyElement = ids.map(id => ({ id, color: state.grid[id] }));
+			const historyElement = ids.map((id) => ({ id, color: state.grid[id] }));
 			state.history.push(historyElement);
 			if (state.history.length > UNDO_SIZE) {
 				state.history.shift();
@@ -111,7 +119,7 @@ export const mainSlice = createSlice({
 			state.selectedColor = action.payload;
 		},
 
-		popHistory: state => {
+		popHistory: (state) => {
 			state.history.pop();
 		},
 
@@ -122,6 +130,10 @@ export const mainSlice = createSlice({
 				state.grid[id] = gridFromServer[id];
 			}
 		},
+
+		changeBrushType: (state, action: PayloadAction<EBrushType>) => {
+			state.brushType = action.payload;
+		},
 	},
 });
 
@@ -131,6 +143,7 @@ export const selectPixelColor = (id: number) => (state: MainState) => state.grid
 export const selectEmptyHistory = (state: MainState) => state.history.length === 0;
 export const selectBrushType = (state: MainState) => state.brushType;
 
-export const { setPixels, setSelectedColor, pushHistory, popHistory, setGrid } = mainSlice.actions;
+export const { setPixels, setSelectedColor, pushHistory, popHistory, setGrid, changeBrushType } =
+	mainSlice.actions;
 
 export const mainReducer = mainSlice.reducer;

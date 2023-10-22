@@ -2,13 +2,13 @@ import { FC } from 'react';
 import playPNG from '../../resources/png/play.png';
 import { StyledContainer } from './Play.styled';
 import { useAppDispatch } from '../../redux/hooks';
-import { test1 } from '../../redux/slice';
+import { fetchHistory } from '../../redux/slice';
 
 export const Play: FC = () => {
 	const dispatch = useAppDispatch();
 
 	const handleClick = () => {
-		dispatch(test1());
+		dispatch(fetchHistory());
 	};
 
 	return (

@@ -10,7 +10,7 @@ export const StyledMainContainer = styled.div`
 `;
 
 export const StyledGrid = styled.div`
-	margin-top: 10vh;
+	margin-top: 4vh;
 `;
 
 export const StyledPalette = styled.div`

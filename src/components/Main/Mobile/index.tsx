@@ -3,6 +3,7 @@ import { Grid } from '../../Grid';
 import { Palette } from '../../Palette';
 import { Undo } from '../../Undo';
 import { StyledFlexMobile, StyledMainContainer, StyledPaletteUndo } from './styled';
+import { BrushType } from '../../BrushType';
 
 export const MainMobile: FC = () => {
 	return (
@@ -11,6 +12,7 @@ export const MainMobile: FC = () => {
 				<Grid deviceType={1} />
 				<StyledPaletteUndo>
 					<Undo />
+					<BrushType />
 					<Palette />
 				</StyledPaletteUndo>
 			</StyledFlexMobile>

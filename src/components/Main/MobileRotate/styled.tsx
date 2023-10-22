@@ -17,6 +17,7 @@ export const StyledPalette = styled.div`
 `;
 
 export const StyledUndo = styled.div`
+	display: flex;
 	margin-top: 10vh;
 `;
 
