@@ -13,7 +13,7 @@ socket.addEventListener('close', () => {
 	console.log('ws close');
 });
 
-socket.addEventListener('message', message => {
+socket.addEventListener('message', (message) => {
 	const { type, pixels, grid, oldGrid, history } = JSON.parse(message.data);
 	if (type === 'draw') {
 		store.dispatch(setPixelFromServer(pixels));

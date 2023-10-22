@@ -59,10 +59,15 @@ function onConnect(ws) {
 
 		if (type === 'draw') {
 			if (notFirstCycle) {
-				oldGrid[historyIndex] = history[historyIndex];
+				const historyPixels = history[historyIndex];
+
+				for (const pixel of historyPixels) {
+					const { id, color } = pixel;
+					oldGrid[id] = color;
+				}
 			}
 
-			history[historyIndex] = pixels;
+			history[historyIndex] = [...pixels];
 
 			if (historyIndex === MAX_HISTORY_SIZE) {
 				historyIndex = 1;
@@ -117,5 +122,9 @@ function onConnect(ws) {
 console.log('Сервер запущен на 80 порту');
 
 setInterval(() => {
-	fs.writeFileSync('save.txt', JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle }), 'utf-8');
+	fs.writeFileSync(
+		'save.txt',
+		JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle }),
+		'utf-8'
+	);
 }, 60000);

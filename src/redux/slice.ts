@@ -47,13 +47,15 @@ export const setAndSendPixel =
 			}
 		}
 
-		const pixels = [{ id, color: selectedColor }];
+		if (brushType === PENCIL) {
+			const pixels = [{ id, color: selectedColor }];
 
-		dispatch(pushHistory([id]));
-		dispatch(setPixels(pixels));
+			dispatch(pushHistory([id]));
+			dispatch(setPixels(pixels));
 
-		const data = JSON.stringify({ pixels, type: 'draw' });
-		await socket.send(data);
+			const data = JSON.stringify({ pixels, type: 'draw' });
+			await socket.send(data);
+		}
 	};
 
 export const undo = (): AppThunk => async (dispatch, getState) => {
