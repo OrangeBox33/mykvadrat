@@ -1,4 +1,7 @@
+export type DeviceType = 0 | 1 | 2;
+
 export type Id = number;
+export type Ids = Id[];
 
 export type Grid = Record<Id, string>;
 
@@ -8,8 +11,10 @@ export interface PlayHistoryData {
 }
 
 export interface Pixel {
-	id: number;
+	id: Id;
 	color: string;
 }
 
-export type History = Pixel[];
+export type HistoryElement = Pixel[];
+
+export type History = HistoryElement[];

@@ -5,8 +5,13 @@ import { Pixel } from '../Pixel';
 import { StyledGrid } from './Grid.styled';
 import { useAppSelector, useAppDispatch } from '../../redux/hooks';
 import { selectGrid, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
+import { DeviceType } from '../../utils/types';
 
-export const Grid: FC = () => {
+interface IProps {
+	deviceType: DeviceType;
+}
+
+export const Grid: FC<IProps> = ({ deviceType }) => {
 	const grid = useAppSelector(selectGrid);
 	const selectedColor = useAppSelector(selectSelectedColor);
 	const dispatch = useAppDispatch();
@@ -41,7 +46,7 @@ export const Grid: FC = () => {
 		// @ts-ignore
 		<StyledGrid ref={ref} onTouchStart={touchMove} onTouchMove={touchMove}>
 			{createArr(DEFAULT_X * DEFAULT_Y).map((v, index) => (
-				<Pixel key={index} id={index} />
+				<Pixel key={index} id={index} deviceType={deviceType} />
 			))}
 		</StyledGrid>
 	);

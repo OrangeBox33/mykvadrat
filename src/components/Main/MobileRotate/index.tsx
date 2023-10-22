@@ -16,7 +16,7 @@ export const MainMobileRotate: FC = () => {
 				</StyledPalette>
 			</StyledPaletteUndo>
 			<StyledGrid>
-				<Grid />
+				<Grid deviceType={2} />
 			</StyledGrid>
 		</StyledMainContainer>
 	);

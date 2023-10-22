@@ -53,7 +53,7 @@ function onConnect(ws) {
 	clients.add(ws);
 
 	ws.on('message', function (message) {
-		const { type, id, color } = JSON.parse(message);
+		const { type, pixels } = JSON.parse(message);
 
 		console.log(type);
 
@@ -62,7 +62,7 @@ function onConnect(ws) {
 				oldGrid[historyIndex] = history[historyIndex];
 			}
 
-			history[historyIndex] = { id, color };
+			history[historyIndex] = pixels;
 
 			if (historyIndex === MAX_HISTORY_SIZE) {
 				historyIndex = 1;
@@ -71,11 +71,14 @@ function onConnect(ws) {
 				historyIndex++;
 			}
 
-			grid[id] = color;
+			for (const pixel of pixels) {
+				const { id, color } = pixel;
+				grid[id] = color;
+			}
 
 			for (let client of clients) {
 				if (client !== ws) {
-					client.send(JSON.stringify({ type, id, color }));
+					client.send(JSON.stringify({ type, pixels }));
 				}
 			}
 		}
@@ -89,16 +92,16 @@ function onConnect(ws) {
 
 			if (notFirstCycle) {
 				for (let i = historyIndex; i < MAX_HISTORY_SIZE; i++) {
-					const { id, color } = history[i];
+					const pixels = history[i];
 
-					historyForClient.push({ id, color });
+					historyForClient.push(pixels);
 				}
 			}
 
 			for (let i = 0; i < historyIndex; i++) {
-				const { id, color } = history[i];
+				const pixels = history[i];
 
-				historyForClient.push({ id, color });
+				historyForClient.push(pixels);
 			}
 
 			ws.send(JSON.stringify({ type: 'history', oldGrid, history: historyForClient }));

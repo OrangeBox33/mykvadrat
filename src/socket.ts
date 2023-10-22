@@ -14,9 +14,9 @@ socket.addEventListener('close', () => {
 });
 
 socket.addEventListener('message', message => {
-	const { type, id, color, grid, oldGrid, history } = JSON.parse(message.data);
+	const { type, pixels, grid, oldGrid, history } = JSON.parse(message.data);
 	if (type === 'draw') {
-		store.dispatch(setPixelFromServer({ id, color }));
+		store.dispatch(setPixelFromServer(pixels));
 	}
 
 	if (type === 'getGrid') {

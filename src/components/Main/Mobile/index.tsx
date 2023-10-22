@@ -8,7 +8,7 @@ export const MainMobile: FC = () => {
 	return (
 		<StyledMainContainer>
 			<StyledFlexMobile>
-				<Grid />
+				<Grid deviceType={1} />
 				<StyledPaletteUndo>
 					<Undo />
 					<Palette />

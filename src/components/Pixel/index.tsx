@@ -1,19 +1,22 @@
 import { MouseEvent, memo } from 'react';
 import { StyledPixel } from './Pixel.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectPixelColor, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
+import { selectBrushType, selectPixelColor, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
+import { DeviceType } from '../../utils/types';
 
 interface IProps {
 	id: number;
+	deviceType: DeviceType;
 }
 
-export const Pixel = memo<IProps>(({ id }) => {
+export const Pixel = memo<IProps>(({ id, deviceType }) => {
 	const pixelColor = useAppSelector(selectPixelColor(id));
 	const selectedColor = useAppSelector(selectSelectedColor);
+	const brushType = useAppSelector(selectBrushType);
 	const dispatch = useAppDispatch();
 
 	const handleHover = (e: MouseEvent) => {
-		if (e.buttons === 1 && pixelColor !== selectedColor) {
+		if (deviceType === 0 && e.buttons === 1 && pixelColor !== selectedColor) {
 			dispatch(setAndSendPixel(id));
 		}
 	};
@@ -24,9 +27,5 @@ export const Pixel = memo<IProps>(({ id }) => {
 		}
 	};
 
-	return (
-		<StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown}>
-			{id}
-		</StyledPixel>
-	);
+	return <StyledPixel color={pixelColor} onMouseOver={handleHover} onMouseDown={handleMouseDown}></StyledPixel>;
 });
