@@ -2,23 +2,26 @@ import { FC } from 'react';
 import { Grid } from '../../Grid';
 import { Palette } from '../../Palette';
 import {
+	StyledFlex,
 	StyledGrid,
 	StyledMainContainer,
 	StyledPalette,
 	StyledPaletteUndoDesktop,
-	StyledUndo,
 } from './styled';
 import { Undo } from '../../Undo';
 import { Play } from '../../Play';
 import { BrushType } from '../../BrushType';
+import { Reset } from '../../Reset';
 
 export const MainDesktop: FC = () => {
 	return (
 		<StyledMainContainer>
 			<div>
-				<StyledUndo>
+				<StyledFlex>
 					<Play />
-				</StyledUndo>
+					<Reset />
+				</StyledFlex>
+
 				<StyledGrid>
 					<Grid deviceType={0} />
 				</StyledGrid>

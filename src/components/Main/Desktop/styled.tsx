@@ -31,3 +31,7 @@ export const StyledPaletteUndoDesktop = styled.div`
 	justify-content: space-between;
 	margin-top: 5vh;
 `;
+
+export const StyledFlex = styled.div`
+	display: flex;
+`;

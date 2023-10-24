@@ -69,8 +69,13 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 	await socket.send(data);
 };
 
-export const fetchHistory = (): AppThunk => async (dispatch, getState) => {
+export const fetchHistory = (): AppThunk => async () => {
 	const data = JSON.stringify({ type: 'history' });
+	await socket.send(data);
+};
+
+export const resetServerHistory = (): AppThunk => async () => {
+	const data = JSON.stringify({ type: 'resetHistory' });
 	await socket.send(data);
 };
 

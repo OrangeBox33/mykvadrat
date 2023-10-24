@@ -111,6 +111,12 @@ function onConnect(ws) {
 
 			ws.send(JSON.stringify({ type: 'history', oldGrid, history: historyForClient }));
 		}
+
+		if (type === 'resetHistory') {
+			history = [];
+			historyIndex = 0;
+			notFirstCycle = false;
+		}
 	});
 
 	ws.on('close', function () {
