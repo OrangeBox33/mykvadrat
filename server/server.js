@@ -7,8 +7,8 @@ import { WebSocketServer } from 'ws';
 import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { KEYS_OPTIONS, MAX_HISTORY_SIZE } from './constants.js';
-import { createGrid } from './helpers.js';
+import { ARDUINO_ACTIONS, KEYS_OPTIONS, MAX_HISTORY_SIZE } from './constants.js';
+import { createGrid, hexToRgb } from './helpers.js';
 
 const app = express();
 
@@ -45,8 +45,28 @@ historyIndex = parsedData.historyIndex;
 notFirstCycle = parsedData.notFirstCycle;
 
 const clients = new Set();
-const wsServer = new WebSocketServer({ server });
-wsServer.on('connection', onConnect);
+const arduinoClient = { client: null };
+
+const wssServer = new WebSocketServer({ server });
+const wsServer = new WebSocketServer({ port: 81 });
+
+wsServer.on('connection', onConnectArduino);
+wssServer.on('connection', onConnect);
+
+function onConnectArduino(ws) {
+	console.log('Arduino login');
+
+	arduinoClient.client = ws;
+
+	const arrForArduino = [ARDUINO_ACTIONS.GRID];
+
+	for (const id in grid) {
+		const rgbArr32 = hexToRgb(grid[id]).map((value) => Math.floor(value / 8));
+		arrForArduino.push(+id, ...rgbArr32);
+	}
+
+	arduinoClient.client.send(new Uint8Array(arrForArduino));
+}
 
 function onConnect(ws) {
 	console.log('подключился');
@@ -54,8 +74,6 @@ function onConnect(ws) {
 
 	ws.on('message', function (message) {
 		const { type, pixels } = JSON.parse(message);
-
-		console.log(type);
 
 		if (type === 'draw') {
 			if (notFirstCycle) {
@@ -76,15 +94,25 @@ function onConnect(ws) {
 				historyIndex++;
 			}
 
+			const arrForArduino = [ARDUINO_ACTIONS.DRAW];
+
 			for (const pixel of pixels) {
 				const { id, color } = pixel;
+
 				grid[id] = color;
+
+				const rgbArr32 = hexToRgb(color).map((value) => Math.floor(value / 8));
+				arrForArduino.push(id, ...rgbArr32);
 			}
 
-			for (let client of clients) {
+			for (const client of clients) {
 				if (client !== ws) {
 					client.send(JSON.stringify({ type, pixels }));
 				}
+			}
+
+			if (arduinoClient.client) {
+				arduinoClient.client.send(new Uint8Array(arrForArduino));
 			}
 		}
 
@@ -121,7 +149,13 @@ function onConnect(ws) {
 
 	ws.on('close', function () {
 		console.log('отключился');
-		clients.delete(ws);
+		if (clients.has(ws)) {
+			clients.delete(ws);
+		}
+
+		if (ws === arduinoClient.client) {
+			arduinoClient.client = null;
+		}
 	});
 }
 

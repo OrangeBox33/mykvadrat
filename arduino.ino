@@ -20,17 +20,15 @@
 #include <WiFi.h>
 #include "FastLED.h"
 
-#define NUM_LEDS 1024
+#define NUM_LEDS 256
 #define DATA_PIN 13
 
 CRGB leds[NUM_LEDS];
 
-const char* ssid = "Simpson"; //Enter SSID
-const char* password = "22222222"; //Enter Password
-const char* websockets_server_host = "188.225.60.209"; //Enter server adress
+const char* ssid = "AGA_slow"; //Enter SSID
+const char* password = "enchanter"; //Enter Password
+const char* websockets_server_host = "5.44.46.7"; //Enter server adress
 const uint16_t websockets_server_port = 81; // Enter server port
-bool canNextMessage = 1;
-int jj = 0;
 
 using namespace websockets;
 WebsocketsClient client;
@@ -48,27 +46,41 @@ void onEventCallback(WebsocketsEvent event, String data) {
 
 void onMessageCallback(WebsocketsMessage message)
 {
-  canNextMessage = 0;
-  Serial.println("mes");
+  // Serial.println("mes");
 
-  if (message.isEmpty())
-  {
+  if (message.isEmpty()) {
     return;
   }
 
   const uint32_t length = message.length();
   const char *data = message.c_str();
+  // Serial.println(data[0]);
 
-  for (uint32_t i = 0; i < length; i += 4)
-  {
-    leds[i] = CRGB(
-        data[i + 1] - 0,
-        data[i + 2] - 0,
-        data[i + 3] - 0);
-  }
+  // if (data[0] == 1) {
+    for (uint32_t i = 1; i < length; i += 4) {
+      // Serial.println(data[i] - 0);
+      // Serial.println(data[i+1] - 0);
+      // Serial.println(data[i+2] - 0);
+      // Serial.println(data[i+3] - 0);
+
+      
+      leds[data[i]] = CRGB(
+        data[i+1] - 0,
+        data[i+2] - 0,
+        data[i+3] - 0
+      );
+    }
+  // }
+
+  // for (uint32_t i = 0; i < length; i += 4)
+  // {
+  //   leds[data[i]] = CRGB(
+  //       data[i + 1] - 0,
+  //       data[i + 2] - 0,
+  //       data[i + 3] - 0);
+  // }
 
   FastLED.show();
-  canNextMessage = 1;
 }
 
 void setup() {
@@ -93,7 +105,7 @@ void setup() {
     bool connected = client.connect(websockets_server_host, websockets_server_port, "/");
     if(connected) {
         Serial.println("Connected!");
-        client.send("Hello Server");
+        client.send("I am Arduino");
     } else {
         Serial.println("Not Connected!");
     }
@@ -107,10 +119,8 @@ void setup() {
 }
 
 void loop() {
-    if(client.available() && canNextMessage == 1) {
-        Serial.println(jj++);
+    if(client.available()) {
         client.poll();
-        client.ping();
     } else {
       bool connected = client.connect(websockets_server_host, websockets_server_port, "/");
       
@@ -118,8 +128,9 @@ void loop() {
         Serial.println("Connected!");
       } else {
         Serial.println("Not Connected!");
+        delay(1000);
       }
     }
 
-    delay(1500);
+    delay(200);
 }
