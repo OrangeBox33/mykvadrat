@@ -132,10 +132,7 @@ export const mainSlice = createSlice({
 
 		setGrid: (state, action: PayloadAction<Grid>) => {
 			const gridFromServer = action.payload;
-
-			for (const id in gridFromServer) {
-				state.grid[id] = gridFromServer[id];
-			}
+			state.grid = gridFromServer;
 		},
 
 		changeBrushType: (state, action: PayloadAction<EBrushType>) => {

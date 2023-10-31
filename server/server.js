@@ -60,9 +60,9 @@ function onConnectArduino(ws) {
 
 	const arrForArduino = [ARDUINO_ACTIONS.GRID];
 
-	for (const id in grid) {
+	for (let id = 0; id < grid.length; id++) {
 		const rgbArr32 = hexToRgb(grid[id]).map((value) => Math.floor(value / 8));
-		arrForArduino.push(+id, ...rgbArr32);
+		arrForArduino.push(id, ...rgbArr32);
 	}
 
 	arduinoClient.client.send(new Uint8Array(arrForArduino));
@@ -142,6 +142,7 @@ function onConnect(ws) {
 
 		if (type === 'resetHistory') {
 			history = [];
+			oldGrid = [...grid];
 			historyIndex = 0;
 			notFirstCycle = false;
 		}

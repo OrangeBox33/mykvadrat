@@ -3,7 +3,7 @@ export type DeviceType = 0 | 1 | 2;
 export type Id = number;
 export type Ids = Id[];
 
-export type Grid = Record<Id, string>;
+export type Grid = string[];
 
 export interface PlayHistoryData {
 	oldGrid: Grid;

@@ -3,6 +3,7 @@ import fs from 'fs';
 export const DEFAULT_COLOR = '#303030';
 export const DEFAULT_X = 16;
 export const DEFAULT_Y = 16;
+export const SIZE = DEFAULT_X * DEFAULT_Y;
 export const MAX_HISTORY_SIZE = 1000;
 export const ARDUINO_ACTIONS = { GRID: 1, DRAW: 2, HISTORY: 3 };
 

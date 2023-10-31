@@ -2,7 +2,7 @@ import { DEFAULT_COLOR, DEFAULT_X } from './constants';
 import { Ids } from './types';
 
 export const createGrid = (size: number) => {
-	const grid: Record<number, string> = {};
+	const grid: string[] = [];
 	for (let i = 0; i < size; i++) {
 		grid[i] = DEFAULT_COLOR;
 	}
@@ -20,7 +20,7 @@ export const createArr = (size: number) => {
 };
 
 export const sleep = async (timer: number) => {
-	return new Promise(resolve => setTimeout(resolve, timer));
+	return new Promise((resolve) => setTimeout(resolve, timer));
 };
 
 export const needPaintPixels = (id: number): Ids => {

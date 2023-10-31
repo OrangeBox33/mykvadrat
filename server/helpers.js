@@ -21,7 +21,7 @@ export const reviver = (key, value) => {
 };
 
 export const createGrid = () => {
-	const grid = {};
+	const grid = [];
 	for (let i = 0; i < DEFAULT_X * DEFAULT_Y; i++) {
 		grid[i] = DEFAULT_COLOR;
 	}
