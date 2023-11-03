@@ -42,8 +42,10 @@ export const setAndSendPixel =
 				dispatch(pushHistory(realNeedPaintIds));
 				dispatch(setPixels(pixels));
 
-				const data = JSON.stringify({ pixels, type: 'draw' });
-				await socket.send(data);
+				if (socket.readyState === socket.OPEN) {
+					const data = JSON.stringify({ pixels, type: 'draw' });
+					await socket.send(data);
+				}
 			}
 		}
 
@@ -53,8 +55,10 @@ export const setAndSendPixel =
 			dispatch(pushHistory([id]));
 			dispatch(setPixels(pixels));
 
-			const data = JSON.stringify({ pixels, type: 'draw' });
-			await socket.send(data);
+			if (socket.readyState === socket.OPEN) {
+				const data = JSON.stringify({ pixels, type: 'draw' });
+				await socket.send(data);
+			}
 		}
 	};
 
@@ -65,18 +69,24 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 	dispatch(setPixels(pixels!));
 	dispatch(popHistory());
 
-	const data = JSON.stringify({ pixels, type: 'draw' });
-	await socket.send(data);
+	if (socket.readyState === socket.OPEN) {
+		const data = JSON.stringify({ pixels, type: 'draw' });
+		await socket.send(data);
+	}
 };
 
 export const fetchHistory = (): AppThunk => async () => {
-	const data = JSON.stringify({ type: 'history' });
-	await socket.send(data);
+	if (socket.readyState === socket.OPEN) {
+		const data = JSON.stringify({ type: 'history' });
+		await socket.send(data);
+	}
 };
 
 export const resetServerHistory = (): AppThunk => async () => {
-	const data = JSON.stringify({ type: 'resetHistory' });
-	await socket.send(data);
+	if (socket.readyState === socket.OPEN) {
+		const data = JSON.stringify({ type: 'resetHistory' });
+		await socket.send(data);
+	}
 };
 
 export const setPixelFromServer =

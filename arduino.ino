@@ -44,8 +44,7 @@ void onEventCallback(WebsocketsEvent event, String data) {
   }
 }
 
-void onMessageCallback(WebsocketsMessage message)
-{
+void onMessageCallback(WebsocketsMessage message) {
   // Serial.println("mes");
 
   if (message.isEmpty()) {
@@ -58,12 +57,6 @@ void onMessageCallback(WebsocketsMessage message)
 
   // if (data[0] == 1) {
     for (uint32_t i = 1; i < length; i += 4) {
-      // Serial.println(data[i] - 0);
-      // Serial.println(data[i+1] - 0);
-      // Serial.println(data[i+2] - 0);
-      // Serial.println(data[i+3] - 0);
-
-      
       leds[data[i]] = CRGB(
         data[i+1] - 0,
         data[i+2] - 0,
@@ -72,13 +65,7 @@ void onMessageCallback(WebsocketsMessage message)
     }
   // }
 
-  // for (uint32_t i = 0; i < length; i += 4)
-  // {
-  //   leds[data[i]] = CRGB(
-  //       data[i + 1] - 0,
-  //       data[i + 2] - 0,
-  //       data[i + 3] - 0);
-  // }
+
 
   FastLED.show();
 }
@@ -103,6 +90,7 @@ void setup() {
     Serial.println("Connected to Wifi, Connecting to server.");
     // try to connect to Websockets server
     bool connected = client.connect(websockets_server_host, websockets_server_port, "/");
+
     if(connected) {
         Serial.println("Connected!");
         client.send("I am Arduino");

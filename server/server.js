@@ -8,7 +8,7 @@ import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { ARDUINO_ACTIONS, KEYS_OPTIONS, MAX_HISTORY_SIZE } from './constants.js';
-import { createGrid, hexToRgb } from './helpers.js';
+import { createGrid, hexToRgb, convertIdForArduino } from './helpers.js';
 
 const app = express();
 
@@ -61,16 +61,22 @@ function onConnectArduino(ws) {
 	const arrForArduino = [ARDUINO_ACTIONS.GRID];
 
 	for (let id = 0; id < grid.length; id++) {
-		const rgbArr32 = hexToRgb(grid[id]).map((value) => Math.floor(value / 8));
+		const rgbArr32 = hexToRgb(grid[convertIdForArduino(id)]).map((value) => Math.floor(value / 8));
 		arrForArduino.push(id, ...rgbArr32);
 	}
 
 	arduinoClient.client.send(new Uint8Array(arrForArduino));
+
+	ws.on('close', function () {
+		console.log('отключился Arduino');
+
+		arduinoClient.client = null;
+	});
 }
 
 function onConnect(ws) {
-	console.log('подключился');
 	clients.add(ws);
+	ws.send(JSON.stringify({ type: 'getGrid', grid }));
 
 	ws.on('message', function (message) {
 		const { type, pixels } = JSON.parse(message);
@@ -102,7 +108,7 @@ function onConnect(ws) {
 				grid[id] = color;
 
 				const rgbArr32 = hexToRgb(color).map((value) => Math.floor(value / 8));
-				arrForArduino.push(id, ...rgbArr32);
+				arrForArduino.push(convertIdForArduino(id), ...rgbArr32);
 			}
 
 			for (const client of clients) {
