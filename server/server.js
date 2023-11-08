@@ -7,7 +7,13 @@ import { WebSocketServer } from 'ws';
 import fs from 'fs';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { ARDUINO_ACTIONS, KEYS_OPTIONS, MAX_HISTORY_SIZE } from './constants.js';
+import {
+	ARDUINO_ACTIONS,
+	KEYS_OPTIONS,
+	HISTORY_SIZE,
+	CHAT_SIZE,
+	CHAT_MESSAGE_SIZE,
+} from './constants.js';
 import { createGrid, hexToRgb, convertIdForArduino } from './helpers.js';
 
 const app = express();
@@ -35,6 +41,7 @@ let oldGrid = createGrid();
 let history = [];
 let historyIndex = 0;
 let notFirstCycle = false;
+let chat = [];
 
 const data = fs.readFileSync('./save.txt', { encoding: 'utf8', flag: 'r' });
 const parsedData = JSON.parse(data);
@@ -43,6 +50,7 @@ oldGrid = parsedData.oldGrid;
 history = parsedData.history;
 historyIndex = parsedData.historyIndex;
 notFirstCycle = parsedData.notFirstCycle;
+chat = parsedData.chat;
 
 const clients = new Set();
 const arduinoClient = { client: null };
@@ -57,6 +65,7 @@ function onConnectArduino(ws) {
 	console.log('Arduino login');
 
 	arduinoClient.client = ws;
+	arduinoClient.client.isAlive = true;
 
 	const arrForArduino = [ARDUINO_ACTIONS.GRID];
 
@@ -67,10 +76,26 @@ function onConnectArduino(ws) {
 
 	arduinoClient.client.send(new Uint8Array(arrForArduino));
 
-	ws.on('close', function () {
-		console.log('отключился Arduino');
+	arduinoClient.client.on('close', function () {
+		console.log('Arduino closed');
 
 		arduinoClient.client = null;
+	});
+
+	arduinoClient.client.on('ping', function () {
+		console.log('arduino ping');
+
+		if (arduinoClient.client) {
+			arduinoClient.client.pong();
+		}
+	});
+
+	arduinoClient.client.on('pong', function () {
+		console.log('arduino pong');
+
+		if (arduinoClient.client) {
+			arduinoClient.client.isAlive = true;
+		}
 	});
 }
 
@@ -79,7 +104,27 @@ function onConnect(ws) {
 	ws.send(JSON.stringify({ type: 'getGrid', grid }));
 
 	ws.on('message', function (message) {
-		const { type, pixels } = JSON.parse(message);
+		const { type, pixels, chatMsg } = JSON.parse(message);
+
+		if (type === 'getChat') {
+			ws.send(JSON.stringify({ type, chat }));
+		}
+
+		if (type === 'sendToChat') {
+			if (chat.length > CHAT_SIZE) {
+				chat.shift();
+			}
+
+			if (chatMsg?.userName && chatMsg?.text) {
+				const slicedText = text.slice(0, CHAT_MESSAGE_SIZE);
+
+				chat.push({ userName, slicedText });
+
+				for (const client of clients) {
+					client.send(JSON.stringify({ type, chatMsg: { userName, text: slicedText } }));
+				}
+			}
+		}
 
 		if (type === 'draw') {
 			if (notFirstCycle) {
@@ -93,7 +138,7 @@ function onConnect(ws) {
 
 			history[historyIndex] = [...pixels];
 
-			if (historyIndex === MAX_HISTORY_SIZE) {
+			if (historyIndex === HISTORY_SIZE) {
 				historyIndex = 1;
 				notFirstCycle = true;
 			} else {
@@ -130,7 +175,7 @@ function onConnect(ws) {
 			const historyForClient = [];
 
 			if (notFirstCycle) {
-				for (let i = historyIndex; i < MAX_HISTORY_SIZE; i++) {
+				for (let i = historyIndex; i < HISTORY_SIZE; i++) {
 					const pixels = history[i];
 
 					historyForClient.push(pixels);
@@ -169,9 +214,24 @@ function onConnect(ws) {
 console.log('Сервер запущен на 80 порту');
 
 setInterval(() => {
+	if (arduinoClient.client) {
+		if (!arduinoClient.client.isAlive) {
+			console.log('Arduino соединение прервано');
+			arduinoClient.client.terminate();
+			arduinoClient.client = null;
+
+			return;
+		}
+
+		arduinoClient.client.isAlive = false;
+		arduinoClient.client.ping();
+	}
+}, 30000);
+
+setInterval(() => {
 	fs.writeFileSync(
 		'save.txt',
-		JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle }),
+		JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle, chat }),
 		'utf-8'
 	);
 }, 60000);

@@ -1,23 +1,5 @@
-/*
-	Esp32 Websockets Client
-
-	This sketch:
-        1. Connects to a WiFi network
-        2. Connects to a Websockets server
-        3. Sends the websockets server a message ("Hello Server")
-        4. Prints all incoming messages while the connection is open
-
-	Hardware:
-        For this sketch you only need an ESP32 board.
-
-	Created 15/02/2019
-	By Gil Maimon
-	https://github.com/gilmaimon/ArduinoWebsockets
-
-*/
-
-#include <ArduinoWebsockets.h>
 #include <WiFi.h>
+#include <WebSocketsClient.h>
 #include "FastLED.h"
 
 #define NUM_LEDS 256
@@ -25,100 +7,83 @@
 
 CRGB leds[NUM_LEDS];
 
-const char* ssid = "AGA_slow"; //Enter SSID
-const char* password = "enchanter"; //Enter Password
-const char* websockets_server_host = "5.44.46.7"; //Enter server adress
-const uint16_t websockets_server_port = 81; // Enter server port
+const char* ssid = "AGA_slow";
+const char* password = "enchanter";
+const char* serverIp = "5.44.46.7";
+const uint16_t serverPort = 81;
+const char* serverURL = "/";
 
-using namespace websockets;
-WebsocketsClient client;
+const unsigned long timeIntervall = 15*60*1000;
+unsigned long timeStamp = 0;
 
-void onEventCallback(WebsocketsEvent event, String data) {
-  if(event == WebsocketsEvent::ConnectionOpened) {
-  } else if(event == WebsocketsEvent::ConnectionClosed) {
-    // tryConnect();
-  } else if(event == WebsocketsEvent::GotPing) {
-    client.pong();
-  } else if(event == WebsocketsEvent::GotPong) {
-    client.ping();
-  }
-}
+WebSocketsClient webSocket;
 
-void onMessageCallback(WebsocketsMessage message) {
-  // Serial.println("mes");
+// Serial.println(" ");
 
-  if (message.isEmpty()) {
-    return;
-  }
 
-  const uint32_t length = message.length();
-  const char *data = message.c_str();
-  // Serial.println(data[0]);
-
-  // if (data[0] == 1) {
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+  if (type == WStype_BIN && length > 0 ) {
+    Serial.println("bin");
     for (uint32_t i = 1; i < length; i += 4) {
-      leds[data[i]] = CRGB(
-        data[i+1] - 0,
-        data[i+2] - 0,
-        data[i+3] - 0
+      leds[payload[i]] = CRGB(
+        payload[i+1] - 0,
+        payload[i+2] - 0,
+        payload[i+3] - 0
       );
     }
-  // }
 
+    FastLED.show();
+  }
 
-
-  FastLED.show();
+  if (type == WStype_DISCONNECTED) {
+    Serial.println("WStype_DISCONNECTED");
+  }
 }
+
+
+
+
 
 void setup() {
     Serial.begin(115200);
-    // Connect to wifi
+
     WiFi.begin(ssid, password);
 
-    // Wait some time to connect to wifi
+
     for(int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
         Serial.print(".");
         delay(1000);
     }
-
-    // Check if connected to wifi
     if(WiFi.status() != WL_CONNECTED) {
         Serial.println("No Wifi!");
         return;
     }
-
     Serial.println("Connected to Wifi, Connecting to server.");
-    // try to connect to Websockets server
-    bool connected = client.connect(websockets_server_host, websockets_server_port, "/");
 
-    if(connected) {
-        Serial.println("Connected!");
-        client.send("I am Arduino");
-    } else {
-        Serial.println("Not Connected!");
-    }
-    
-    // run callback when messages are received
-    client.onMessage(onMessageCallback);
-    // client.onEvent(onEventCallback);
+    webSocket.begin(serverIp, serverPort, serverURL);
+	  webSocket.onEvent(webSocketEvent);
+    webSocket.setReconnectInterval(3000);
+    webSocket.enableHeartbeat(30000, 1000, 100);
 
     delay(2000);
     FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
 }
 
 void loop() {
-    if(client.available()) {
-        client.poll();
-    } else {
-      bool connected = client.connect(websockets_server_host, websockets_server_port, "/");
-      
-      if(connected) {
-        Serial.println("Connected!");
-      } else {
-        Serial.println("Not Connected!");
-        delay(1000);
-      }
-    }
+  webSocket.loop();
+  // Serial.print(".");
+  // delay(1000);
 
-    delay(200);
+  if(millis() - timeStamp > timeIntervall ){
+
+    timeStamp = millis();  // reset the timer
+  }
+
+  if(WiFi.status() != WL_CONNECTED) {
+    Serial.println("wifi not connected");
+    delay(2000);
+    setup();
+  }
+
+  // delay(400);
 }
