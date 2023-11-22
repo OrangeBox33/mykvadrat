@@ -55,7 +55,7 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 
 export const fetchHistory = (): AppThunk => async () => {
 	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ type: 'history' });
+		const data = JSON.stringify({ type: 'playHistory' });
 		await socket.send(data);
 	}
 };

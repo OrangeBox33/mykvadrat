@@ -24,7 +24,7 @@ socket.addEventListener('message', (message) => {
 		store.dispatch(setGrid(grid));
 	}
 
-	if (type === 'history') {
+	if (type === 'playHistory') {
 		store.dispatch(playHistory({ oldGrid, history }));
 	}
 

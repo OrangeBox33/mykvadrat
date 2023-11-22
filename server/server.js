@@ -13,6 +13,9 @@ import {
 	HISTORY_SIZE,
 	CHAT_SIZE,
 	CHAT_MESSAGE_SIZE,
+	CHAT_USERNAME_SIZE,
+	PLAY_HISTORY,
+	RESET_HISTORY,
 } from './constants.js';
 import { createGrid, hexToRgb, convertIdForArduino } from './helpers.js';
 
@@ -109,12 +112,45 @@ function onConnect(ws) {
 
 		if (type === 'getChat') {
 			ws.send(JSON.stringify({ type, chat }));
+
+			return;
 		}
 
 		if (type === 'sendToChat') {
 			const { username, text } = chatMessage;
 
 			if (text) {
+				if (username === PLAY_HISTORY && text === PLAY_HISTORY) {
+					const historyForClient = [];
+
+					if (notFirstCycle) {
+						for (let i = historyIndex; i < HISTORY_SIZE; i++) {
+							const pixels = history[i];
+
+							historyForClient.push(pixels);
+						}
+					}
+
+					for (let i = 0; i < historyIndex; i++) {
+						const pixels = history[i];
+
+						historyForClient.push(pixels);
+					}
+
+					ws.send(JSON.stringify({ type: 'playHistory', oldGrid, history: historyForClient }));
+
+					return;
+				}
+
+				if (username === RESET_HISTORY && text === RESET_HISTORY) {
+					history = [];
+					oldGrid = [...grid];
+					historyIndex = 0;
+					notFirstCycle = false;
+
+					return;
+				}
+
 				if (chat.length > CHAT_SIZE) {
 					chat.shift();
 				}
@@ -130,6 +166,8 @@ function onConnect(ws) {
 					);
 				}
 			}
+
+			return;
 		}
 
 		if (type === 'draw') {
@@ -171,37 +209,14 @@ function onConnect(ws) {
 			if (arduinoClient.client) {
 				arduinoClient.client.send(new Uint8Array(arrForArduino));
 			}
+
+			return;
 		}
 
 		if (type === 'getGrid') {
 			ws.send(JSON.stringify({ type: 'getGrid', grid }));
-		}
 
-		if (type === 'history') {
-			const historyForClient = [];
-
-			if (notFirstCycle) {
-				for (let i = historyIndex; i < HISTORY_SIZE; i++) {
-					const pixels = history[i];
-
-					historyForClient.push(pixels);
-				}
-			}
-
-			for (let i = 0; i < historyIndex; i++) {
-				const pixels = history[i];
-
-				historyForClient.push(pixels);
-			}
-
-			ws.send(JSON.stringify({ type: 'history', oldGrid, history: historyForClient }));
-		}
-
-		if (type === 'resetHistory') {
-			history = [];
-			oldGrid = [...grid];
-			historyIndex = 0;
-			notFirstCycle = false;
+			return;
 		}
 	});
 
