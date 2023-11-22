@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { StyledContainer } from './Reset.styled';
 import { useAppDispatch } from '../../redux/hooks';
-import { resetServerHistory } from '../../redux/slice';
+import { resetServerHistory } from '../../redux/thunk';
 
 export const Reset: FC = () => {
 	const dispatch = useAppDispatch();

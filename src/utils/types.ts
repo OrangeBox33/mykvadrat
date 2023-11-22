@@ -18,3 +18,7 @@ export interface Pixel {
 export type HistoryElement = Pixel[];
 
 export type History = HistoryElement[];
+
+export type ChatMessage = { username: string; text: string };
+
+export type Chat = ChatMessage[];

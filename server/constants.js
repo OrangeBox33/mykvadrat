@@ -6,8 +6,9 @@ export const DEFAULT_Y = 16;
 export const SIZE = DEFAULT_X * DEFAULT_Y;
 export const MAX_HISTORY_SIZE = 1000;
 export const ARDUINO_ACTIONS = { GRID: 1, DRAW: 2, HISTORY: 3 };
-export const CHAT_SIZE = 100;
+export const CHAT_SIZE = 20;
 export const CHAT_MESSAGE_SIZE = 150;
+export const CHAT_USERNAME_SIZE = 16;
 
 export const KEYS_OPTIONS = {
 	key: fs.readFileSync('./ssl/privateKey.key'), // PRIVATE KEY

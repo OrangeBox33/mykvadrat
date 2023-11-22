@@ -43,7 +43,7 @@ let historyIndex = 0;
 let notFirstCycle = false;
 let chat = [];
 
-const data = fs.readFileSync('./save.txt', { encoding: 'utf8', flag: 'r' });
+const data = fs.readFileSync('./save.json');
 const parsedData = JSON.parse(data);
 grid = parsedData.grid;
 oldGrid = parsedData.oldGrid;
@@ -102,26 +102,32 @@ function onConnectArduino(ws) {
 function onConnect(ws) {
 	clients.add(ws);
 	ws.send(JSON.stringify({ type: 'getGrid', grid }));
+	ws.send(JSON.stringify({ type: 'getChat', chat }));
 
 	ws.on('message', function (message) {
-		const { type, pixels, chatMsg } = JSON.parse(message);
+		const { type, pixels, chatMessage } = JSON.parse(message);
 
 		if (type === 'getChat') {
 			ws.send(JSON.stringify({ type, chat }));
 		}
 
 		if (type === 'sendToChat') {
-			if (chat.length > CHAT_SIZE) {
-				chat.shift();
-			}
+			const { username, text } = chatMessage;
 
-			if (chatMsg?.userName && chatMsg?.text) {
+			if (text) {
+				if (chat.length > CHAT_SIZE) {
+					chat.shift();
+				}
+
+				const slicedUsername = username.slice(0, CHAT_USERNAME_SIZE);
 				const slicedText = text.slice(0, CHAT_MESSAGE_SIZE);
 
-				chat.push({ userName, slicedText });
+				chat.push({ username: slicedUsername, text: slicedText });
 
 				for (const client of clients) {
-					client.send(JSON.stringify({ type, chatMsg: { userName, text: slicedText } }));
+					client.send(
+						JSON.stringify({ type, chatMessage: { username: slicedUsername, text: slicedText } })
+					);
 				}
 			}
 		}
@@ -230,8 +236,7 @@ setInterval(() => {
 
 setInterval(() => {
 	fs.writeFileSync(
-		'save.txt',
-		JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle, chat }),
-		'utf-8'
+		'save.json',
+		JSON.stringify({ grid, oldGrid, history, historyIndex, notFirstCycle, chat })
 	);
 }, 60000);

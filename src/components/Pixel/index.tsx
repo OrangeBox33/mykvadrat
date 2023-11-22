@@ -1,14 +1,10 @@
 import { MouseEvent, memo } from 'react';
 import { StyledPixel } from './Pixel.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import {
-	selectBrushType,
-	selectPixelColor,
-	selectSelectedColor,
-	setAndSendPixel,
-} from '../../redux/slice';
+import { selectBrushType, selectPixelColor, selectSelectedColor } from '../../redux/slice';
 import { DeviceType } from '../../utils/types';
 import { PENCIL } from '../../utils/constants';
+import { setAndSendPixel } from '../../redux/thunk';
 
 interface IProps {
 	id: number;

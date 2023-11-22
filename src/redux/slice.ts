@@ -6,18 +6,17 @@ import {
 	PALETTE,
 	EBrushType,
 	PENCIL,
-	BRUSH,
+	CHAT_SIZE,
 } from '../utils/constants';
-import { Grid, History, Id, Ids, Pixel, PlayHistoryData } from '../utils/types';
-import { createGrid, needPaintPixels, sleep } from '../utils/utils';
-import { socket } from '../socket';
-import { AppThunk } from './store';
+import { Chat, ChatMessage, Grid, History, Ids, Pixel } from '../utils/types';
+import { createGrid } from '../utils/utils';
 
 export interface MainState {
 	grid: Grid;
 	selectedColor: string;
 	brushType: EBrushType;
 	history: History;
+	chat: Chat;
 }
 
 const initialState: MainState = {
@@ -25,92 +24,14 @@ const initialState: MainState = {
 	selectedColor: PALETTE[0],
 	brushType: PENCIL,
 	history: [],
+	chat: [],
 };
 
-export const setAndSendPixel =
-	(id: Id): AppThunk =>
-	async (dispatch, getState) => {
-		const { selectedColor, brushType, grid } = getState();
-		if (brushType === BRUSH) {
-			const allNeedPaintIds = needPaintPixels(id);
-
-			const realNeedPaintIds = allNeedPaintIds.filter((id) => grid[id] !== selectedColor);
-
-			if (realNeedPaintIds.length) {
-				const pixels = realNeedPaintIds.map((id) => ({ id, color: selectedColor }));
-
-				dispatch(pushHistory(realNeedPaintIds));
-				dispatch(setPixels(pixels));
-
-				if (socket.readyState === socket.OPEN) {
-					const data = JSON.stringify({ pixels, type: 'draw' });
-					await socket.send(data);
-				}
-			}
-		}
-
-		if (brushType === PENCIL) {
-			const pixels = [{ id, color: selectedColor }];
-
-			dispatch(pushHistory([id]));
-			dispatch(setPixels(pixels));
-
-			if (socket.readyState === socket.OPEN) {
-				const data = JSON.stringify({ pixels, type: 'draw' });
-				await socket.send(data);
-			}
-		}
-	};
-
-export const undo = (): AppThunk => async (dispatch, getState) => {
-	const { history } = getState();
-	const pixels = history.at(-1);
-
-	dispatch(setPixels(pixels!));
-	dispatch(popHistory());
-
-	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ pixels, type: 'draw' });
-		await socket.send(data);
-	}
-};
-
-export const fetchHistory = (): AppThunk => async () => {
-	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ type: 'history' });
-		await socket.send(data);
-	}
-};
-
-export const resetServerHistory = (): AppThunk => async () => {
-	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ type: 'resetHistory' });
-		await socket.send(data);
-	}
-};
-
-export const setPixelFromServer =
-	(pixels: Pixel[]): AppThunk =>
-	async (dispatch) => {
-		dispatch(setPixels(pixels));
-	};
-
-export const setGridFromServer =
-	(grid: Grid): AppThunk =>
-	async (dispatch) => {
-		dispatch(setGrid(grid));
-	};
-
-export const playHistory =
-	({ oldGrid, history }: PlayHistoryData): AppThunk =>
-	async (dispatch) => {
-		await dispatch(setGrid(oldGrid));
-
-		for (let i = 0; i < history.length; i++) {
-			await sleep(15);
-			await dispatch(setPixels(history[i]));
-		}
-	};
+// export const getChat =
+// 	(chat: Chat): AppThunk =>
+// 	async (dispatch) => {
+// 		dispatch(setPixels(pixels));
+// 	};
 
 export const mainSlice = createSlice({
 	name: 'main',
@@ -148,6 +69,18 @@ export const mainSlice = createSlice({
 		changeBrushType: (state, action: PayloadAction<EBrushType>) => {
 			state.brushType = action.payload;
 		},
+
+		setChat: (state, action: PayloadAction<Chat>) => {
+			state.chat = action.payload;
+		},
+
+		addMessage: (state, action: PayloadAction<ChatMessage>) => {
+			if (state.chat.length > CHAT_SIZE) {
+				state.chat.shift();
+			}
+
+			state.chat.push(action.payload);
+		},
 	},
 });
 
@@ -156,8 +89,17 @@ export const selectGrid = (state: MainState) => state.grid;
 export const selectPixelColor = (id: number) => (state: MainState) => state.grid[id];
 export const selectEmptyHistory = (state: MainState) => state.history.length === 0;
 export const selectBrushType = (state: MainState) => state.brushType;
+export const selectChat = (state: MainState) => state.chat;
 
-export const { setPixels, setSelectedColor, pushHistory, popHistory, setGrid, changeBrushType } =
-	mainSlice.actions;
+export const {
+	setPixels,
+	setSelectedColor,
+	pushHistory,
+	popHistory,
+	setGrid,
+	changeBrushType,
+	setChat,
+	addMessage,
+} = mainSlice.actions;
 
 export const mainReducer = mainSlice.reducer;

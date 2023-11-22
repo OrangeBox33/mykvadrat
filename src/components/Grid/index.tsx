@@ -3,17 +3,15 @@ import { createArr } from '../../utils/utils';
 import { DEFAULT_X, DEFAULT_Y, PIXEL_GAP, PIXEL_SIZE } from '../../utils/constants';
 import { Pixel } from '../Pixel';
 import { StyledGrid } from './Grid.styled';
-import { useAppSelector, useAppDispatch } from '../../redux/hooks';
-import { selectGrid, selectSelectedColor, setAndSendPixel } from '../../redux/slice';
+import { useAppDispatch } from '../../redux/hooks';
 import { DeviceType } from '../../utils/types';
+import { setAndSendPixel } from '../../redux/thunk';
 
 interface IProps {
 	deviceType: DeviceType;
 }
 
 export const Grid: FC<IProps> = ({ deviceType }) => {
-	const grid = useAppSelector(selectGrid);
-	const selectedColor = useAppSelector(selectSelectedColor);
 	const dispatch = useAppDispatch();
 	const [offset, setOffset] = useState({ x: 0, y: 0 });
 	const ref = useRef<HTMLDivElement>(null);
@@ -25,7 +23,7 @@ export const Grid: FC<IProps> = ({ deviceType }) => {
 		}
 	}, [ref]);
 
-	const touchMove = (e: TouchEvent) => {
+	const touchMove = (e: React.TouchEvent) => {
 		const x = e.touches[0].clientX - offset.x;
 		const y = e.touches[0].clientY - offset.y;
 
@@ -34,16 +32,12 @@ export const Grid: FC<IProps> = ({ deviceType }) => {
 
 		if (posX >= 0 && posX < DEFAULT_X && posY >= 0 && posY < DEFAULT_Y) {
 			const id = posY * DEFAULT_X + posX;
-			const pixelColor = grid[id];
 
-			if (pixelColor !== selectedColor) {
-				dispatch(setAndSendPixel(id));
-			}
+			dispatch(setAndSendPixel(id));
 		}
 	};
 
 	return (
-		// @ts-ignore
 		<StyledGrid ref={ref} onTouchStart={touchMove} onTouchMove={touchMove}>
 			{createArr(DEFAULT_X * DEFAULT_Y).map((v, index) => (
 				<Pixel key={index} id={index} deviceType={deviceType} />

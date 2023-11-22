@@ -1,6 +1,7 @@
-import { playHistory, setGridFromServer, setPixelFromServer } from './redux/slice';
+import { addMessage, setChat, setGrid, setPixels } from './redux/slice';
 import { store } from './redux/store';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { playHistory } from './redux/thunk';
 
 export const socket = new ReconnectingWebSocket('wss://kvadratnikitosa.ru');
 
@@ -14,16 +15,24 @@ export const socket = new ReconnectingWebSocket('wss://kvadratnikitosa.ru');
 // });
 
 socket.addEventListener('message', (message) => {
-	const { type, pixels, grid, oldGrid, history } = JSON.parse(message.data);
+	const { type, pixels, grid, oldGrid, history, chat, chatMessage } = JSON.parse(message.data);
 	if (type === 'draw') {
-		store.dispatch(setPixelFromServer(pixels));
+		store.dispatch(setPixels(pixels));
 	}
 
 	if (type === 'getGrid') {
-		store.dispatch(setGridFromServer(grid));
+		store.dispatch(setGrid(grid));
 	}
 
 	if (type === 'history') {
 		store.dispatch(playHistory({ oldGrid, history }));
+	}
+
+	if (type === 'getChat') {
+		store.dispatch(setChat(chat));
+	}
+
+	if (type === 'sendToChat') {
+		store.dispatch(addMessage(chatMessage));
 	}
 });

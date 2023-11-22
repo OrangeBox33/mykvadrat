@@ -12,6 +12,7 @@ import { Undo } from '../../Undo';
 import { Play } from '../../Play';
 import { BrushType } from '../../BrushType';
 import { Reset } from '../../Reset';
+import { Chat } from '../../Chat';
 
 export const MainDesktop: FC = () => {
 	return (
@@ -24,6 +25,7 @@ export const MainDesktop: FC = () => {
 
 				<StyledGrid>
 					<Grid deviceType={0} />
+					<Chat />
 				</StyledGrid>
 				<StyledPaletteUndoDesktop>
 					<Undo />
