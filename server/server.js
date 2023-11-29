@@ -17,7 +17,14 @@ import {
 	PLAY_HISTORY,
 	RESET_HISTORY,
 } from './constants.js';
-import { createGrid, hexToRgb, convertIdForArduino } from './helpers.js';
+import {
+	createGrid,
+	hexToRgb,
+	convertIdForArduino,
+	makeAndSendGridToArduino,
+	makeAndSendPixelsToArduino,
+	sleep,
+} from './helpers.js';
 
 const app = express();
 
@@ -45,6 +52,7 @@ let history = [];
 let historyIndex = 0;
 let notFirstCycle = false;
 let chat = [];
+let playingHistory = false;
 
 const data = fs.readFileSync('./save.json');
 const parsedData = JSON.parse(data);
@@ -70,14 +78,7 @@ function onConnectArduino(ws) {
 	arduinoClient.client = ws;
 	arduinoClient.client.isAlive = true;
 
-	const arrForArduino = [ARDUINO_ACTIONS.GRID];
-
-	for (let id = 0; id < grid.length; id++) {
-		const rgbArr32 = hexToRgb(grid[convertIdForArduino(id)]).map((value) => Math.floor(value / 8));
-		arrForArduino.push(id, ...rgbArr32);
-	}
-
-	arduinoClient.client.send(new Uint8Array(arrForArduino));
+	makeAndSendGridToArduino(grid, arduinoClient);
 
 	arduinoClient.client.on('close', function () {
 		console.log('Arduino closed');
@@ -107,7 +108,7 @@ function onConnect(ws) {
 	ws.send(JSON.stringify({ type: 'getGrid', grid }));
 	ws.send(JSON.stringify({ type: 'getChat', chat }));
 
-	ws.on('message', function (message) {
+	ws.on('message', async function (message) {
 		const { type, pixels, chatMessage } = JSON.parse(message);
 
 		if (type === 'getChat') {
@@ -121,23 +122,38 @@ function onConnect(ws) {
 
 			if (text) {
 				if (username === PLAY_HISTORY && text === PLAY_HISTORY) {
-					const historyForClient = [];
+					if (arduinoClient.client) {
+						playingHistory = true;
 
-					if (notFirstCycle) {
-						for (let i = historyIndex; i < HISTORY_SIZE; i++) {
+						const historyForClient = [];
+
+						if (notFirstCycle) {
+							for (let i = historyIndex; i < HISTORY_SIZE; i++) {
+								const pixels = history[i];
+
+								historyForClient.push(pixels);
+							}
+						}
+
+						for (let i = 0; i < historyIndex; i++) {
 							const pixels = history[i];
 
 							historyForClient.push(pixels);
 						}
+
+						makeAndSendGridToArduino(oldGrid, arduinoClient);
+
+						for (let i = 0; i < historyForClient.length; i++) {
+							await sleep(20);
+							const pixels = historyForClient[i];
+							makeAndSendPixelsToArduino(pixels, arduinoClient);
+						}
+
+						await sleep(100);
+						makeAndSendGridToArduino(grid, arduinoClient);
+
+						playingHistory = false;
 					}
-
-					for (let i = 0; i < historyIndex; i++) {
-						const pixels = history[i];
-
-						historyForClient.push(pixels);
-					}
-
-					ws.send(JSON.stringify({ type: 'playHistory', oldGrid, history: historyForClient }));
 
 					return;
 				}
@@ -171,6 +187,7 @@ function onConnect(ws) {
 		}
 
 		if (type === 'draw') {
+			// Работа с историей
 			if (notFirstCycle) {
 				const historyPixels = history[historyIndex];
 
@@ -189,25 +206,22 @@ function onConnect(ws) {
 				historyIndex++;
 			}
 
-			const arrForArduino = [ARDUINO_ACTIONS.DRAW];
-
+			// запись в grid
 			for (const pixel of pixels) {
 				const { id, color } = pixel;
-
 				grid[id] = color;
-
-				const rgbArr32 = hexToRgb(color).map((value) => Math.floor(value / 8));
-				arrForArduino.push(convertIdForArduino(id), ...rgbArr32);
 			}
 
+			// отправка клиентам
 			for (const client of clients) {
 				if (client !== ws) {
 					client.send(JSON.stringify({ type, pixels }));
 				}
 			}
 
-			if (arduinoClient.client) {
-				arduinoClient.client.send(new Uint8Array(arrForArduino));
+			// отправка ардуино
+			if (!playingHistory) {
+				makeAndSendPixelsToArduino(pixels, arduinoClient);
 			}
 
 			return;

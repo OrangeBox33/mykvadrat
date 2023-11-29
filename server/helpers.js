@@ -1,4 +1,4 @@
-import { DEFAULT_COLOR, DEFAULT_X, DEFAULT_Y } from './constants.js';
+import { DEFAULT_COLOR, DEFAULT_X, DEFAULT_Y, ARDUINO_ACTIONS } from './constants.js';
 
 export const createGrid = () => {
 	const grid = [];
@@ -41,5 +41,43 @@ export const convertIdForArduino = (id) => {
 		return posY * DEFAULT_X + DEFAULT_X - 1 - (id % DEFAULT_X);
 	} else {
 		return id;
+	}
+};
+
+export const sleep = async (timeout) => {
+	return new Promise((res) => {
+		setTimeout(res, timeout);
+	});
+};
+
+export const makeAndSendGridToArduino = (grid, arduinoClient) => {
+	if (arduinoClient.client) {
+		const arrForArduino = [ARDUINO_ACTIONS.GRID];
+
+		for (let id = 0; id < grid.length; id++) {
+			const rgbArr256 = hexToRgb(grid[convertIdForArduino(id)]);
+			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / 8));
+
+			arrForArduino.push(id, ...rgbArr32);
+		}
+
+		arduinoClient.client.send(new Uint8Array(arrForArduino));
+	}
+};
+
+export const makeAndSendPixelsToArduino = (pixels, arduinoClient) => {
+	if (arduinoClient.client) {
+		const arrForArduino = [ARDUINO_ACTIONS.DRAW];
+
+		for (const pixel of pixels) {
+			const { id, color } = pixel;
+
+			const rgbArr256 = hexToRgb(color);
+			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / 8));
+
+			arrForArduino.push(convertIdForArduino(id), ...rgbArr32);
+		}
+
+		arduinoClient.client.send(new Uint8Array(arrForArduino));
 	}
 };
