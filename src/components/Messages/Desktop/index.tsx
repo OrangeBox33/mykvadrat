@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef } from 'react';
 import { StyledContainer, StyledMessage, StyledText, StyledUsername } from './Messages.styled';
-import { useAppSelector } from '../../redux/hooks';
-import { selectChat } from '../../redux/slice';
+import { useAppSelector } from '../../../redux/hooks';
+import { selectChat } from '../../../redux/slice';
 
 export const Messages: FC = () => {
 	const chat = useAppSelector(selectChat);
@@ -11,7 +11,7 @@ export const Messages: FC = () => {
 		if (divRef.current) {
 			divRef.current.scrollIntoView({ behavior: 'smooth' });
 		}
-	});
+	}, [chat]);
 
 	return (
 		<StyledContainer>

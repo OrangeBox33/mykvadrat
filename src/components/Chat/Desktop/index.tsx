@@ -1,5 +1,5 @@
 import { FC, useState, ChangeEvent } from 'react';
-import playPNG from '../../resources/png/play.png';
+import playPNG from '../../../resources/png/play.png';
 import {
 	StyledButtonContainer,
 	StyledChatContainer,
@@ -10,10 +10,10 @@ import {
 	StyledLabel,
 	StyledTextContainer,
 } from './Chat.styled';
-import { Messages } from '../Messages';
-import { useAppDispatch } from '../../redux/hooks';
-import { sendMessage } from '../../redux/thunk';
-import { MAX_CHAT_MESSAGE, MAX_USERNAME } from '../../utils/constants';
+import { useAppDispatch } from '../../../redux/hooks';
+import { sendMessage } from '../../../redux/thunk';
+import { MAX_CHAT_MESSAGE, MAX_USERNAME } from '../../../utils/constants';
+import { Messages } from '../../Messages/Desktop';
 
 export const Chat: FC = () => {
 	const [username, setUsername] = useState('');

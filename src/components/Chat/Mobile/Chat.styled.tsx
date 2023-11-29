@@ -1,39 +1,40 @@
 import styled from 'styled-components';
-import { DEFAULT_Y, PIXEL_GAP, PIXEL_SIZE } from '../../utils/constants';
+import { PIXEL_SIZE, PIXEL_GAP, DEFAULT_Y, DEFAULT_X } from '../../../utils/constants';
 
-const height = (PIXEL_SIZE + PIXEL_GAP) * DEFAULT_Y - 1;
-const width = ((PIXEL_SIZE + PIXEL_GAP) * DEFAULT_Y) / 1.7;
-const marginLeft = (PIXEL_SIZE + PIXEL_GAP) * (DEFAULT_Y + 2);
-const textHeight = 80;
+const gridHeight = (PIXEL_SIZE + PIXEL_GAP) * DEFAULT_Y;
+const gridWidth = (PIXEL_SIZE + PIXEL_GAP) * DEFAULT_X;
+const textHeight = 100;
 const buttonSize = 26;
-const labelHeight = 30;
+const labelHeight = 24;
+const windowHeight = window.screen.height;
 
 export const StyledContainer = styled.div`
-	height: ${height}px;
-	width: ${width}px;
-	margin-top: ${-height}px;
-	margin-left: ${marginLeft}px;
+	height: calc(${windowHeight - gridHeight - 44}px - 35vh);
+	width: ${gridWidth}px;
+	margin-bottom: 5vh;
 	background-color: #535459;
-	position: absolute;
 	border: 2px solid #1c1c1c;
 `;
 
 export const StyledChatContainer = styled.div`
 	box-sizing: border-box;
-	height: ${height - textHeight}px;
-	width: ${width}px;
+	height: calc(${windowHeight - gridHeight - 44}px - 35vh);
+	/* width: ${gridWidth}px; */
 	background-color: #c0c2cb;
-	border: 1px solid #1c1c1c;
 `;
 
 export const StyledTextContainer = styled.div`
 	box-sizing: border-box;
+	position: relative;
 	height: ${textHeight}px;
-	width: ${width}px;
+	width: calc(100% + 4px);
+	margin-left: -2px;
+	margin-top: -1px;
 	background-color: #c0c2cb;
-	border: 1px solid #1c1c1c;
+	border: 2px solid #1c1c1c;
 	display: flex;
 	flex-direction: column;
+	z-index: 2;
 `;
 
 export const StyledInputNickname = styled.input`
@@ -42,9 +43,9 @@ export const StyledInputNickname = styled.input`
 	padding: 2px 6px;
 	box-sizing: border-box;
 	background-color: #c0c2cb;
-	width: ${width - buttonSize}px;
 	font-size: 18px;
 	border-bottom: 1px solid #1c1c1c;
+	width: 100%;
 `;
 
 export const StyledInputText = styled.textarea`
@@ -94,5 +95,10 @@ export const StyledLabel = styled.span`
 	background-color: #313134;
 	border-bottom: 2px solid #1c1c1c;
 	color: #d9d9d9;
-	font-size: 20px;
+	font-size: 16px;
+`;
+
+export const StyledOpenEditor = styled(StyledLabel)`
+	border-top: 2px solid #1c1c1c;
+	border-bottom: 0;
 `;
