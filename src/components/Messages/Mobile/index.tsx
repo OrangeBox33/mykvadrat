@@ -9,7 +9,7 @@ export const Messages: FC = () => {
 
 	useEffect(() => {
 		if (divRef.current) {
-			divRef.current.scrollIntoView({ behavior: 'smooth' });
+			// divRef.current.scrollIntoView({ behavior: 'smooth' });
 		}
 	}, [chat]);
 

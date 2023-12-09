@@ -11,7 +11,7 @@ const windowHeight = window.screen.height;
 export const StyledContainer = styled.div`
 	height: calc(${windowHeight - gridHeight - 44}px - 35vh);
 	width: ${gridWidth}px;
-	margin-bottom: 5vh;
+	margin-bottom: 3vh;
 	background-color: #535459;
 	border: 2px solid #1c1c1c;
 `;

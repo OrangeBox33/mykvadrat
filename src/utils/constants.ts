@@ -16,7 +16,7 @@ export const PALETTE = [
 	'#FF8C00',
 	'#66CDAA',
 	'#000000',
-	'#303030',
+	'#FFFFFF',
 ];
 
 export enum EBrushType {

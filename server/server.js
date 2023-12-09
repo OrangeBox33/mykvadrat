@@ -144,7 +144,7 @@ function onConnect(ws) {
 						makeAndSendGridToArduino(oldGrid, arduinoClient);
 
 						for (let i = 0; i < historyForClient.length; i++) {
-							await sleep(20);
+							await sleep(25);
 							const pixels = historyForClient[i];
 							makeAndSendPixelsToArduino(pixels, arduinoClient);
 						}
