@@ -1,4 +1,10 @@
-import { DEFAULT_COLOR, DEFAULT_X, DEFAULT_Y, ARDUINO_ACTIONS } from './constants.js';
+import {
+	DEFAULT_COLOR,
+	DEFAULT_X,
+	DEFAULT_Y,
+	ARDUINO_ACTIONS,
+	BRIGHTNESS_DEVISION,
+} from './constants.js';
 
 export const createGrid = () => {
 	const grid = [];
@@ -56,7 +62,7 @@ export const makeAndSendGridToArduino = (grid, arduinoClient) => {
 
 		for (let id = 0; id < grid.length; id++) {
 			const rgbArr256 = hexToRgb(grid[convertIdForArduino(id)]);
-			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / 8));
+			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / BRIGHTNESS_DEVISION));
 
 			arrForArduino.push(id, ...rgbArr32);
 		}
@@ -73,7 +79,7 @@ export const makeAndSendPixelsToArduino = (pixels, arduinoClient) => {
 			const { id, color } = pixel;
 
 			const rgbArr256 = hexToRgb(color);
-			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / 8));
+			const rgbArr32 = rgbArr256.map((value) => Math.floor(value / BRIGHTNESS_DEVISION));
 
 			arrForArduino.push(convertIdForArduino(id), ...rgbArr32);
 		}

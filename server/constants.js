@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-export const DEFAULT_COLOR = '#303030';
+export const DEFAULT_COLOR = '#000000';
 export const DEFAULT_X = 16;
 export const DEFAULT_Y = 16;
 export const SIZE = DEFAULT_X * DEFAULT_Y;
@@ -11,6 +11,7 @@ export const CHAT_MESSAGE_SIZE = 150;
 export const CHAT_USERNAME_SIZE = 16;
 export const PLAY_HISTORY = '42';
 export const RESET_HISTORY = '228';
+export const BRIGHTNESS_DEVISION = 3;
 
 export const KEYS_OPTIONS = {
 	key: fs.readFileSync('./ssl/privateKey.key'), // PRIVATE KEY
