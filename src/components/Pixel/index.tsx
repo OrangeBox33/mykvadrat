@@ -3,7 +3,7 @@ import { StyledPixel } from './Pixel.styled';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectBrushType, selectPixelColor, selectSelectedColor } from '../../redux/slice';
 import { DeviceType } from '../../utils/types';
-import { PENCIL } from '../../utils/constants';
+import { PALETTE_DICTIONARY, PENCIL } from '../../utils/constants';
 import { setAndSendPixel } from '../../redux/thunk';
 
 interface IProps {
@@ -35,7 +35,8 @@ export const Pixel = memo<IProps>(({ id, deviceType }) => {
 
 	return (
 		<StyledPixel
-			color={pixelColor}
+			// @ts-ignore
+			color={PALETTE_DICTIONARY[pixelColor] || pixelColor}
 			onMouseOver={handleHover}
 			onMouseDown={handleMouseDown}
 		></StyledPixel>

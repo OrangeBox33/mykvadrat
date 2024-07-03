@@ -3,7 +3,7 @@ import {
 	DEFAULT_X,
 	DEFAULT_Y,
 	UNDO_SIZE,
-	PALETTE,
+	PALETTE2,
 	EBrushType,
 	PENCIL,
 	CHAT_SIZE,
@@ -21,7 +21,7 @@ export interface MainState {
 
 const initialState: MainState = {
 	grid: createGrid(DEFAULT_X * DEFAULT_Y),
-	selectedColor: PALETTE[0],
+	selectedColor: PALETTE2[2],
 	brushType: PENCIL,
 	history: [],
 	chat: [],

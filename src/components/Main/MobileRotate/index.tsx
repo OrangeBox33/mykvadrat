@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Grid } from '../../Grid';
-import { Palette } from '../../Palette';
+import { Palette1 } from '../../Palette';
 import { Undo } from '../../Undo';
 import {
 	StyledMainContainer,
@@ -20,7 +20,7 @@ export const MainMobileRotate: FC = () => {
 					<BrushType />
 				</StyledUndo>
 				<StyledPalette>
-					<Palette />
+					<Palette1 />
 				</StyledPalette>
 			</StyledPaletteUndo>
 			<StyledGrid>

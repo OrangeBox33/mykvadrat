@@ -35,3 +35,9 @@ export const StyledPaletteUndoDesktop = styled.div`
 export const StyledFlex = styled.div`
 	display: flex;
 `;
+
+export const StyledWrapper = styled.div`
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+`;

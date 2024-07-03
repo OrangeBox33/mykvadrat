@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { StyledPalettePixel } from './PalettePixel.styled';
+import { PALETTE_DICTIONARY } from '../../utils/constants';
 
 interface IProps {
 	color: string;
@@ -8,5 +9,12 @@ interface IProps {
 }
 
 export const PalettePixel: FC<IProps> = ({ color, isActive, handleClick }) => {
-	return <StyledPalettePixel color={color} isActive={isActive} onClick={() => handleClick(color)} />;
+	return (
+		<StyledPalettePixel
+			// @ts-ignore
+			color={PALETTE_DICTIONARY[color] || color}
+			isActive={isActive}
+			onClick={() => handleClick(color)}
+		/>
+	);
 };
