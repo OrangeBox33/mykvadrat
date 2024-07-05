@@ -29,6 +29,7 @@ export const PALETTE_DICTIONARY = {
 	'#000028': '#030380',
 	'#7FFFD4': '#7aedff',
 	'#7B68EE': '#726ce0',
+	'#804040': '#804040',
 };
 
 export const PALETTE1 = [
@@ -53,6 +54,7 @@ export const PALETTE2 = [
 	'#000028',
 	'#7FFFD4',
 	'#7B68EE',
+	'#804040',
 ];
 
 export enum EBrushType {
