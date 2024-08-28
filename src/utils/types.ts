@@ -5,11 +5,6 @@ export type Ids = Id[];
 
 export type Grid = string[];
 
-export interface PlayHistoryData {
-	oldGrid: Grid;
-	history: History;
-}
-
 export interface Pixel {
 	id: Id;
 	color: string;

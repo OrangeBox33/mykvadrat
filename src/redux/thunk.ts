@@ -1,8 +1,8 @@
 import { socket } from '../socket';
 import { BRUSH, PENCIL } from '../utils/constants';
-import { Id, PlayHistoryData, ChatMessage } from '../utils/types';
-import { needPaintPixels, sleep } from '../utils/utils';
-import { pushHistory, setPixels, popHistory, setGrid } from './slice';
+import { Id, ChatMessage } from '../utils/types';
+import { needPaintPixels } from '../utils/utils';
+import { pushHistory, setPixels, popHistory } from './slice';
 import { AppThunk } from './store';
 
 export const setAndSendPixel =
@@ -52,31 +52,6 @@ export const undo = (): AppThunk => async (dispatch, getState) => {
 		await socket.send(data);
 	}
 };
-
-export const fetchHistory = (): AppThunk => async () => {
-	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ type: 'playHistory' });
-		await socket.send(data);
-	}
-};
-
-export const resetServerHistory = (): AppThunk => async () => {
-	if (socket.readyState === socket.OPEN) {
-		const data = JSON.stringify({ type: 'resetHistory' });
-		await socket.send(data);
-	}
-};
-
-export const playHistory =
-	({ oldGrid, history }: PlayHistoryData): AppThunk =>
-	async (dispatch) => {
-		await dispatch(setGrid(oldGrid));
-
-		for (let i = 0; i < history.length; i++) {
-			await sleep(15);
-			await dispatch(setPixels(history[i]));
-		}
-	};
 
 export const sendMessage =
 	({ username, text }: ChatMessage): AppThunk =>
